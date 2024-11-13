@@ -12,18 +12,9 @@ import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { Column } from "./components/Column/Column";
 import { Input } from "./components/Input/Input";
 
-import "./App.css";
-
-export default function App() {
-  const [tasks, setTasks] = useState([
-    { id: 1, title: "Add tests to homepage" },
-    { id: 2, title: "Fix styling in about section" },
-    { id: 3, title: "Learn how to center a div" },
-  ]);
-
-  const addTask = (title) => {
-    setTasks((tasks) => [...tasks, { id: tasks.length + 1, title }]);
-  };
+const App = () => {
+  const [tasks, setTasks] = useState([]);
+  const [columns, setColumns] = useState([{ id: 'toDo', tasks: [] }]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -47,17 +38,32 @@ export default function App() {
     });
   };
 
+  const addTask = (task) => {
+    setTasks([...tasks, task]);
+  };
+
+  const addColumn = () => {
+    const newColumn = { id: `column-${columns.length + 1}`, tasks: [] };
+    setColumns([...columns, newColumn]);
+  };
+
   return (
     <div className="App">
       <h1>My Tasks ✅</h1>
       <Input onSubmit={addTask} />
+      <button onClick={addColumn}>Add Column</button>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCorners}
         onDragEnd={handleDragEnd}
+        className="dnd-container"
       >
-        <Column id="toDo" tasks={tasks} />
+        {columns.map((column) => (
+          <Column key={column.id} id={column.id} tasks={column.tasks} />
+        ))}
       </DndContext>
     </div>
   );
-}
+};
+
+export default App;
