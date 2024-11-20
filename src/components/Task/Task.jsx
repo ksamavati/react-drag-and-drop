@@ -3,7 +3,7 @@ import { CSS } from "@dnd-kit/utilities";
 
 import "./Task.css";
 
-export const Task = ({ id, title }) => {
+export const Task = ({ id, text }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
 
@@ -21,7 +21,7 @@ export const Task = ({ id, title }) => {
       className="task"
     >
       <input type="checkbox" className="checkbox" />
-      {title}
+      {text}
     </div>
   );
 };

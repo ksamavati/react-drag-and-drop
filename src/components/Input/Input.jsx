@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import "./Input.css";
 
-export const Input = ({ onSubmit }) => {
+export const Input = ({ onSubmit, caption }) => {
   const [input, setInput] = useState("");
 
   const handleSubmit = () => {
@@ -22,7 +22,7 @@ export const Input = ({ onSubmit }) => {
         onChange={(e) => setInput(e.target.value)}
       />
       <button onClick={handleSubmit} className="button">
-        Add
+        {caption}
       </button>
     </div>
   );

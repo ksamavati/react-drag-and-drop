@@ -1,69 +1,50 @@
 import { useState } from "react";
-import {
-  DndContext,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  closestCorners,
-} from "@dnd-kit/core";
+import { DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, closestCorners } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
 import { Column } from "./components/Column/Column";
-import { Input } from "./components/Input/Input";
+
+import "./App.css";
 
 const App = () => {
-  const [tasks, setTasks] = useState([]);
-  const [columns, setColumns] = useState([{ id: 'toDo', tasks: [] }]);
+	const [columns, setColumns] = useState([{ id: "toDo", tasks: [] }]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+	const sensors = useSensors(
+		useSensor(PointerSensor),
+		useSensor(KeyboardSensor, {
+			coordinateGetter: sortableKeyboardCoordinates,
+		})
+	);
+	const handleDragEnd = (event) => {
+		const { active, over } = event;
 
-  const getTaskPos = (id) => tasks.findIndex((task) => task.id === id);
+		if (active.id === over.id) return;
 
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
+		setTasks((tasks) => {
+			const originalPos = getTaskPos(active.id);
+			const newPos = getTaskPos(over.id);
 
-    if (active.id === over.id) return;
+			return arrayMove(tasks, originalPos, newPos);
+		});
+	};
+	const addColumn = () => {
+		const newColumn = { id: `column-${columns.length + 1}`, tasks: [] };
+		setColumns([...columns, newColumn]);
+	};
 
-    setTasks((tasks) => {
-      const originalPos = getTaskPos(active.id);
-      const newPos = getTaskPos(over.id);
-
-      return arrayMove(tasks, originalPos, newPos);
-    });
-  };
-
-  const addTask = (task) => {
-    setTasks([...tasks, task]);
-  };
-
-  const addColumn = () => {
-    const newColumn = { id: `column-${columns.length + 1}`, tasks: [] };
-    setColumns([...columns, newColumn]);
-  };
-
-  return (
-    <div className="App">
-      <h1>My Tasks ✅</h1>
-      <Input onSubmit={addTask} />
-      <button onClick={addColumn}>Add Column</button>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCorners}
-        onDragEnd={handleDragEnd}
-        className="dnd-container"
-      >
-        {columns.map((column) => (
-          <Column key={column.id} id={column.id} tasks={column.tasks} />
-        ))}
-      </DndContext>
-    </div>
-  );
+	return (
+		<div className="App">
+			<h1>My Tasks ✅</h1>
+			<button onClick={addColumn}>Add Column</button>
+			<div className="dnd-container">
+				<DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
+					{columns.map((column) => (
+						<Column key={column.id} id={column.id} tasks={column.tasks} />
+					))}
+				</DndContext>
+			</div>
+		</div>
+	);
 };
 
 export default App;
